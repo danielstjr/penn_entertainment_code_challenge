@@ -5,7 +5,7 @@ namespace App\Domain\Repositories;
 use App\Domain\Models\User;
 use Doctrine\ORM\EntityManager;
 use Exception;
-use Psr\Log\InvalidArgumentException;
+use InvalidArgumentException;
 
 /**
  * Repository class that initializes User Domain models from the Doctrine Entity Manager
@@ -37,8 +37,21 @@ class DatabaseUserRepository implements UserRepository
      */
     public function create(string $email, string $name, int $pointBalance = 0): User
     {
-        // TODO:: Implement user creation
-        return new User('', '', '');
+        $existingUsers = $this->entityManager->getRepository(User::class)->findBy(['email' => $email]);
+        if (!empty($existingUsers)) {
+            throw new InvalidArgumentException('Duplicate Email Address');
+        }
+
+        $user = new User($email, $name, null, $pointBalance);
+        try {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        } catch (Exception) {
+            // Remap the exception here out of its implementation specific exception
+            throw new Exception('Failed to save User to database');
+        }
+
+        return $user;
     }
 
     /**
@@ -51,8 +64,14 @@ class DatabaseUserRepository implements UserRepository
      */
     public function delete(int $id): bool
     {
-        // TODO:: Implement user deletion
-        return true;
+        $existingUser = $this->get($id);
+        try {
+            $this->entityManager->remove($existingUser);
+            $this->entityManager->flush();
+            return true;
+        } catch (Exception) {
+            return false;
+        }
     }
 
     /**
@@ -60,25 +79,29 @@ class DatabaseUserRepository implements UserRepository
      *
      * @param int $id Unique User identifier
      *
-     * @throws Exception When the user cannot be found, mapped, and returned
+     * @throws InvalidArgumentException When the user cannot be found, mapped, and returned
      * @return User Domain model retrieved from its database representation
      */
     public function get(int $id): User
     {
-        // TODO:: Implement single user retrieval
-        return new User('', '');
+        /** @var User $user */
+        $user = $this->entityManager->getRepository(User::class)->find($id);
+        if ($user === null) {
+            throw new InvalidArgumentException("Could not find user with id {$id}");
+        }
+
+        return $user;
     }
 
     /**
      * Utilize Doctrine's ORM to retrieve all available User instances from the database
      *
      * @throws Exception When any of the users failed to be retrieved, mapped, and returned
-     * @return array Array of all user instances mapped to a Domain Model
+     * @return User[] Array of all user instances mapped to a Domain Model
      */
     public function getAll(): array
     {
-        // TODO:: Implement all users retrieval
-        return [];
+        return $this->entityManager->getRepository(User::class)->findAll();
     }
 
     /**
@@ -90,7 +113,15 @@ class DatabaseUserRepository implements UserRepository
      */
     public function updatePoints(User $user, int $newBalance): bool
     {
-        // TODO:: Implement updating point count
+        $user->setPointsBalance($newBalance);
+        try {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        } catch (Exception) {
+            // Remap the error here to hide implementation details
+            return false;
+        }
+
         return true;
     }
 }

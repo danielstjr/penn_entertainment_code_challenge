@@ -31,7 +31,7 @@ class UserControllerTest extends TestCase
         $controller = new UserController(new InMemoryUserRepository());
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())->method('getParsedBody')->willReturn([]);
+        $request->expects($this->once())->method('getParsedBody')->willReturn(null);
 
         $response = $controller->create($request, new Response());
         $errors = json_decode($response->getBody(), true);
@@ -107,7 +107,7 @@ class UserControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('getParsedBody')
-            ->willReturn([]);
+            ->willReturn(null);
 
         $controller = new UserController($repository);
 
@@ -134,7 +134,7 @@ class UserControllerTest extends TestCase
         $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('getParsedBody')
-            ->willReturn([]);
+            ->willReturn(null);
 
         $controller = new UserController($repository);
 

@@ -37,11 +37,11 @@ return [
 
             'dev_mode' => $isDevelopmentServer,
 
-            'metadata_directories' => [APP_ROOT . '/src/Domain/Models'],
+            'metadata_directories' => [APP_ROOT . '/app/Domain/Models'],
 
             'migrations' => [
                 'migrations_paths' => [
-                    'App\Migrations' => APP_ROOT . '/migrations',
+                    'Migrations' => APP_ROOT . '/migrations',
                 ],
 
                 'table_storage' => [

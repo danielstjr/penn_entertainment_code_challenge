@@ -40,7 +40,6 @@ interface UserRepository
      * @param int $id
      *
      * @throws InvalidArgumentException When the user cannot be found
-     * @throws Exception When the user cannot be mapped and returned
      * @return User
      */
     public function get(int $id): User;
@@ -49,7 +48,7 @@ interface UserRepository
      * Retrieves all stored user data and maps each to a User Domain Model
      *
      * @throws Exception When any of the users failed to be retrieved, mapped, and returned
-     * @return array
+     * @return User[]
      */
     public function getAll(): array;
 
@@ -59,7 +58,6 @@ interface UserRepository
      * @param User $user
      * @param int $newBalance
      *
-     * @throws InvalidArgumentException If the new balance is less than 0
      * @return bool
      */
     public function updatePoints(User $user, int $newBalance): bool;

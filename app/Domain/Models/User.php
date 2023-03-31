@@ -8,12 +8,13 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
+use JsonSerializable;
 
 /**
  * Domain Class for mapping user data to a database implementation through a repository
  */
 #[Entity, Table(name: 'users')]
-final class User
+final class User implements JsonSerializable
 {
     #[Id, Column, GeneratedValue]
     private ?int $id = null;
@@ -103,11 +104,11 @@ final class User
     }
 
     /**
-     * Array representation of User data
+     * Array representation of User data, used for serialization
      *
      * @return array
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->getId(),

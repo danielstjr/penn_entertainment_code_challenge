@@ -95,7 +95,7 @@ class InMemoryUserRepository implements UserRepository
     /**
      * Return the full user array
      *
-     * @return array
+     * @return User[]
      */
     public function getAll(): array
     {

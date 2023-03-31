@@ -59,7 +59,7 @@ class UserController
      */
     public function create(Request $request, Response $response): Response
     {
-        $postData = $request->getParsedBody();
+        $postData = $request->getParsedBody() ?? [];
         $errors = static::buildErrorArray($postData, [
             'email' => "'email' field is required",
             'name' => "'name' field is required",
@@ -74,11 +74,15 @@ class UserController
 
         try {
             $user = $this->userRepository->create($postData['email'], $postData['name']);
+        } catch (InvalidArgumentException) {
+            $response->getBody()->write('User with this email address already exists');
+            return $response->withStatus(400, 'Duplicate Email');
         } catch (Exception) {
-            return $response->withStatus(500, 'Failed to create user');
+            $response->getBody()->write('Failed to create user');
+            return $response->withStatus(500, 'Internal Server Error');
         }
 
-        $response->getBody()->write(json_encode($user->toArray()));
+        $response->getBody()->write(json_encode($user));
 
         return $response->withStatus(201);
     }
@@ -151,10 +155,10 @@ class UserController
         } catch (InvalidArgumentException) {
             return $response->withStatus(404, "User with id {$id} not found");
         } catch (Exception) {
-            return $response->withStatus(500, "Server Error");
+            return $response->withStatus(500, 'Internal Server Error');
         }
 
-        $postBody = $request->getParsedBody();
+        $postBody = $request->getParsedBody() ?? [];
         $errors = static::buildErrorArray($postBody, [
             'points' => "'points' field is required",
             'description' => "'description' field is required"
