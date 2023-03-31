@@ -1,8 +1,8 @@
 <?php
 
 use Doctrine\Migrations\DependencyFactory;
-use Domain\Repositories\User\DatabaseUserRepository;
-use Domain\Repositories\User\UserRepository;
+use App\Domain\Repositories\DatabaseUserRepository;
+use App\Domain\Repositories\UserRepository;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -10,6 +10,6 @@ use Psr\Container\ContainerInterface;
  */
 return [
     UserRepository::class => function (ContainerInterface $container) {
-        return new DatabaseUserRepository($container->get(DependencyFactory::class));
+        return new DatabaseUserRepository($container->get(DependencyFactory::class)->getEntityManager());
     }
 ];

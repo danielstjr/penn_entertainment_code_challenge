@@ -1,8 +1,8 @@
 <?php
 
-namespace Http\Controllers;
+namespace App\Http\Controllers;
 
-use Domain\Repositories\User\UserRepository;
+use App\Domain\Repositories\UserRepository;
 use Exception;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;

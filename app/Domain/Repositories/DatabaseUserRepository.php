@@ -1,9 +1,9 @@
 <?php
 
-namespace Domain\Repositories\User;
+namespace App\Domain\Repositories;
 
+use App\Domain\Models\User;
 use Doctrine\ORM\EntityManager;
-use Domain\Models\User;
 use Exception;
 use Psr\Log\InvalidArgumentException;
 

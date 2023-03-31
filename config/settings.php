@@ -41,7 +41,7 @@ return [
 
             'migrations' => [
                 'migrations_paths' => [
-                    'MyProject\Migrations' => APP_ROOT . '/migrations',
+                    'App\Migrations' => APP_ROOT . '/migrations',
                 ],
 
                 'table_storage' => [

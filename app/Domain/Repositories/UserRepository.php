@@ -1,8 +1,8 @@
 <?php
 
-namespace Domain\Repositories\User;
+namespace App\Domain\Repositories;
 
-use Domain\Models\User;
+use App\Domain\Models\User;
 use Exception;
 use InvalidArgumentException;
 

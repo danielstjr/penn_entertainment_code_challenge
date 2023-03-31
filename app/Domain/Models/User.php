@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain\Models;
+namespace App\Domain\Models;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
