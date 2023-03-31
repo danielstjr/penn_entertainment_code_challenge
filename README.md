@@ -17,10 +17,8 @@
 {
     GET /users: Retrieve a list of all users and their current points balance.
     POST /users: Create a new user with an initial points balance of 0.
-    POST /users/{id}/earn: Earn points for a user. The request should include the number of points to earn and a 
-        description of the transaction.
-    POST /users/{id}/redeem: Redeem points for a user. The request should include the number of points to redeem and a 
-        description of the transaction.
+    POST /users/{id}/earn: Earn points for a user. The request should include the number of points  to earn and a description of the transaction.
+    POST /users/{id}/redeem: Redeem points for a user. The request should include the number of points to redeem and a description of the transaction.
     DELETE /users/{id}: Delete a user by their ID.
 }
 ```
