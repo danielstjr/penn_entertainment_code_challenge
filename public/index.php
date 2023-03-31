@@ -1,17 +1,27 @@
 <?php
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Factory\AppFactory;
 
-require __DIR__ . '/../vendor/autoload.php';
+use DI\Bridge\Slim\Bridge;
+use DI\ContainerBuilder;
+use Domain\Repositories\User\UserRepository;
+use Psr\Container\ContainerInterface;
 
-$container = require_once __DIR__ . '/../config/bootstrap.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$app = AppFactory::create();
+$builder = new ContainerBuilder();
 
-$app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello world!");
-    return $response;
+$builder->addDefinitions(require __DIR__ . '/../config/settings.php');
+$builder->addDefinitions(require __DIR__ . '/../config/database.php');
+$builder->addDefinitions(require __DIR__ . '/../config/repositories.php');
+
+$container = $builder->build();
+
+$app = Bridge::create($container);
+
+$container->set(\Http\Controllers\UserController::class, function (ContainerInterface $container) {
+    return new \Http\Controllers\UserController($container->get(UserRepository::class));
 });
+
+$routes = require __DIR__ . '/../config/routes.php';
+$routes($app);
 
 $app->run();

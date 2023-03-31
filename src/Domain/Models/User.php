@@ -1,6 +1,6 @@
 <?php
 
-namespace src\domain\models;
+namespace Domain\Models;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -100,6 +100,21 @@ final class User
     public function setPointsBalance(int $newPointsBalance): void
     {
         $this->pointsBalance = $newPointsBalance;
+    }
+
+    /**
+     * Array representation of User data
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'email' => $this->getEmail(),
+            'name' => $this->getName(),
+            'points_balance' => $this->getPointsBalance(),
+        ];
     }
 }
 
