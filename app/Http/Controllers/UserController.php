@@ -60,6 +60,7 @@ class UserController
     public function create(Request $request, Response $response): Response
     {
         $postData = $request->getParsedBody() ?? [];
+        var_dump($postData) . "\n";
         $errors = static::buildErrorArray($postData, [
             'email' => "'email' field is required",
             'name' => "'name' field is required",
