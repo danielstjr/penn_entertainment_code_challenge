@@ -1,17 +1,10 @@
 <?php
 
 use DI\Bridge\Slim\Bridge;
-use DI\ContainerBuilder;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$builder = new ContainerBuilder();
-
-$builder->addDefinitions(require __DIR__ . '/../config/settings.php');
-$builder->addDefinitions(require __DIR__ . '/../config/database.php');
-$builder->addDefinitions(require __DIR__ . '/../config/repositories.php');
-
-$container = $builder->build();
+$container = require_once __DIR__ . '/../config/bootstrap.php';
 
 $app = Bridge::create($container);
 

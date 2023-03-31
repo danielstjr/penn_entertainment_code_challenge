@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Repositories\UserRepository;
 use Exception;
+use InvalidArgumentException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 
@@ -79,15 +80,12 @@ class UserController
 
         $response->getBody()->write(json_encode($user->toArray()));
 
-        return $response
-            ->withHeader(self::CONTENT_TYPE, self::JSON)
-            ->withStatus(201);
+        return $response->withStatus(201);
     }
 
     /**
      * Delete a user identified by the path's user id
      *
-     * @param Request $request
      * @param Response $response
      * @param int $id
      *
@@ -96,9 +94,13 @@ class UserController
     public function delete(Response $response, int $id): Response
     {
         try {
-            $this->userRepository->delete($id);
+            $status = $this->userRepository->delete($id);
         } catch (Exception) {
             return $response->withStatus(404, "User with id {$id} not found");
+        }
+
+        if (!$status) {
+            return $response->withStatus(500, 'Internal Server Error');
         }
 
         return $response->withStatus(200, "User with id {$id} was deleted");
@@ -146,15 +148,19 @@ class UserController
     {
         try {
             $user = $this->userRepository->get($id);
+        } catch (InvalidArgumentException) {
+            return $response->withStatus(404, "User with id {$id} not found");
         } catch (Exception) {
-            return $response->withStatus(400, "User with id {$id} not found");
+            return $response->withStatus(500, "Server Error");
         }
 
         $postBody = $request->getParsedBody();
-        $errors = static::buildErrorArray($request->getParsedBody(), [
+        $errors = static::buildErrorArray($postBody, [
             'points' => "'points' field is required",
             'description' => "'description' field is required"
         ]);
+
+        // TODO:: store description in user_point_transactions table
 
         if (!empty($errors)) {
             $response->getBody()->write(json_encode(['errors' => $errors]));

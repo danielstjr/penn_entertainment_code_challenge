@@ -39,7 +39,8 @@ interface UserRepository
      *
      * @param int $id
      *
-     * @throws Exception When the user cannot be found, mapped, and returned
+     * @throws InvalidArgumentException When the user cannot be found
+     * @throws Exception When the user cannot be mapped and returned
      * @return User
      */
     public function get(int $id): User;
