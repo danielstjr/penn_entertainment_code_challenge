@@ -69,7 +69,6 @@ class InMemoryUserRepository implements UserRepository
         }
 
         $this->users = $newUserArray;
-
         return true;
     }
 
