@@ -81,12 +81,16 @@ class TransactionController extends Controller
         $postBody = $request->getParsedBody() ?? [];
         $errors = static::buildErrorArray($postBody, ['description' => "'description' field is required"]);
 
-        $points = $postBody['points'] ?? null;
+        $points = null;
+        if (array_key_exists('points', $postBody)) {
+            $points = $add ? $postBody['points'] : -$postBody['points'];
+        }
+
         if ($points === null) {
             $errors[] = "'points' field is required";
         } else if ($postBody['points'] < 1) {
             $errors[] = "'points' field must be greater than 0";
-        } else if ($user->getPointsBalance() + ($add ? $postBody['points'] : -$postBody['points']) < 0) {
+        } else if ($user->getPointsBalance() + $points < 0) {
             $errors[] = "Points transactions cannot leave a user with a negative points total";
         }
 
@@ -94,7 +98,6 @@ class TransactionController extends Controller
             return $this->setJsonResponseStatusAndBody($response, 400, json_encode(['errors' => $errors]));
         }
 
-        $points = $add ? $postBody['points'] : -$postBody['points'];
         try {
             $this->transactionRepository->create($postBody['description'], $points, $user);
             $this->userRepository->updatePoints($user, $user->getPointsBalance() + $points);
