@@ -20,7 +20,28 @@ class InMemoryTransactionRepository implements TransactionRepository
      */
     public function __construct(?array $transactions = null)
     {
-        $this->transactions = $transactions;
+        $this->transactions = $transactions ?? [
+            new Transaction(
+                'description 1',
+                1,
+                new User('user1@danielstone.dev', 'User One', 1, 1)
+            ),
+            new Transaction(
+                'description 1',
+                1,
+                new User('user2@danielstone.dev', 'User Two', 2, 2)
+            ),
+            new Transaction(
+                'description 1',
+                1,
+                new User('user3@danielstone.dev', 'User Three', 3, 3)
+            ),
+            new Transaction(
+                'description 1',
+                1,
+                new User('user4@danielstone.dev', 'User Four', 4, 4)
+            ),
+        ];
     }
 
     /**

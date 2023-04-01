@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Http\Controllers;
+namespace Tests\Http\Controllers;
 
 use App\Domain\Models\User;
 use App\Domain\Repositories\User\InMemoryUserRepository;
@@ -91,118 +91,6 @@ class UserControllerTest extends TestCase
         $controller = new UserController(new InMemoryUserRepository());
 
         $response = $controller->delete(new Response(), 1);
-
-        $this->assertEquals(200, $response->getStatusCode());
-    }
-
-    public function testEarnPointsEndpointRequiresPointsAndDescription()
-    {
-        $user = new User('test@example.com', 'test', 100, 1);
-        $repository = $this->createMock(InMemoryUserRepository::class);
-        $repository->expects($this->once())
-            ->method('get')
-            ->with(1)
-            ->willReturn($user);
-
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getParsedBody')
-            ->willReturn(null);
-
-        $controller = new UserController($repository);
-
-        $response = $controller->earnPoints($request, new Response(), 1);
-        $errors = json_decode($response->getBody(), true);
-
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertNotEmpty($errors['errors']);
-
-        // Would make test brittle if there was a lot of back and forth on request validation stuff
-        $this->assertContains("'points' field is required", $errors['errors']);
-        $this->assertContains("'description' field is required", $errors['errors']);
-    }
-
-    public function testRedeemPointsEndpointRequiresPointsAndDescription()
-    {
-        $user = new User('test@example.com', 'test', 100, 1);
-        $repository = $this->createMock(InMemoryUserRepository::class);
-        $repository->expects($this->once())
-            ->method('get')
-            ->with(1)
-            ->willReturn($user);
-
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getParsedBody')
-            ->willReturn(null);
-
-        $controller = new UserController($repository);
-
-        $response = $controller->redeemPoints($request, new Response(), 1);
-        $errors = json_decode($response->getBody(), true);
-
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertNotEmpty($errors['errors']);
-
-        // Would make test brittle if there was a lot of back and forth on request validation stuff
-        $this->assertContains("'points' field is required", $errors['errors']);
-        $this->assertContains("'description' field is required", $errors['errors']);
-    }
-
-    public function testEarningPointsIncreasesUserPointsBalance()
-    {
-        $balance = 100;
-        $pointsParameter = 10;
-
-        $user = new User('test@example.com', 'test', $balance, 1);
-
-        $repository = $this->createMock(InMemoryUserRepository::class);
-        $repository->expects($this->once())
-            ->method('get')
-            ->with(1)
-            ->willReturn($user);
-
-        $repository->expects($this->once())
-            ->method('updatePoints')
-            ->with($user, $balance + $pointsParameter);
-
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getParsedBody')
-            ->willReturn(['points' => 10, 'description' => 'description']);
-
-        $controller = new UserController($repository);
-
-        $response = $controller->earnPoints($request, new Response(), 1);
-
-        $this->assertEquals(200, $response->getStatusCode());
-    }
-
-    public function testRedeemingPointsDecreasesUserPointsBalance()
-    {
-        $balance = 100;
-        $pointsParameter = 10;
-
-        $user = new User('test@example.com', 'test', $balance, 1);
-
-        $repository = $this->createMock(InMemoryUserRepository::class);
-        $repository->expects($this->once())
-            ->method('get')
-            ->with(1)
-            ->willReturn($user);
-
-        $repository->expects($this->once())
-            ->method('updatePoints')
-            ->with($user, $balance - $pointsParameter);
-
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getParsedBody')
-            ->willReturn(['points' => 10, 'description' => 'description']);
-
-        $controller = new UserController($repository);
-
-        $response = $controller->redeemPoints($request, new Response(), 1);
 
         $this->assertEquals(200, $response->getStatusCode());
     }

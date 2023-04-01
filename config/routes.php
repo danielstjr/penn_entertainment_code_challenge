@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Slim\App;
 
@@ -9,7 +10,8 @@ use Slim\App;
 return function (App $app) {
     $app->get('/users', [UserController::class, 'index']);
     $app->post('/users', [UserController::class, 'create']);
-    $app->post('/users/{id}/earn', [UserController::class, 'earnPoints']);
-    $app->post('/users/{id}/redeem', [UserController::class, 'redeemPoints']);
     $app->delete('/users/{id}', [UserController::class, 'delete']);
+
+    $app->post('/users/{id}/earn', [TransactionController::class, 'earnPoints']);
+    $app->post('/users/{id}/redeem', [TransactionController::class, 'redeemPoints']);
 };
