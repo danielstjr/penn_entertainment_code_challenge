@@ -25,7 +25,7 @@ abstract class Controller
     {
         $errors = [];
         foreach ($rules as $requiredField => $errorMessage) {
-            if (!array_key_exists($requiredField, $postData)) {
+            if (!array_key_exists($requiredField, $postData) || $postData[$requiredField] === null) {
                 $errors[] = $errorMessage;
             }
         }

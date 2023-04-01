@@ -44,6 +44,58 @@ class TransactionControllerTest extends TestCase
         $this->assertContains("'description' field is required", $errors['errors']);
     }
 
+    public function testPointsEndpointRequiresPositivePointValues()
+    {
+        $user = new User('test@example.com', 'test', 100, 1);
+        $userRepository = $this->createMock(InMemoryUserRepository::class);
+        $userRepository->expects($this->once())
+            ->method('get')
+            ->with(1)
+            ->willReturn($user);
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->once())
+            ->method('getParsedBody')
+            ->willReturn(['points' => -1]);
+
+        $controller = new TransactionController(new InMemoryTransactionRepository(), $userRepository);
+
+        $response = $controller->earnPoints($request, new Response(), 1);
+        $errors = json_decode($response->getBody(), true);
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertNotEmpty($errors['errors']);
+
+        // Would make test brittle if there was a lot of back and forth on request validation stuff
+        $this->assertContains("'points' field must be greater than 0", $errors['errors']);
+    }
+
+    public function testPointsEndpointEnforcesPositivePointsTotals()
+    {
+        $user = new User('test@example.com', 'test', 100, 1);
+        $userRepository = $this->createMock(InMemoryUserRepository::class);
+        $userRepository->expects($this->once())
+            ->method('get')
+            ->with(1)
+            ->willReturn($user);
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->once())
+            ->method('getParsedBody')
+            ->willReturn(['points' => 200]);
+
+        $controller = new TransactionController(new InMemoryTransactionRepository(), $userRepository);
+
+        $response = $controller->redeemPoints($request, new Response(), 1);
+        $errors = json_decode($response->getBody(), true);
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertNotEmpty($errors['errors']);
+
+        // Would make test brittle if there was a lot of back and forth on request validation stuff
+        $this->assertContains("Points transactions cannot leave a user with a negative points total", $errors['errors']);
+    }
+
     public function testRedeemPointsEndpointRequiresPointsAndDescription()
     {
         $user = new User('test@example.com', 'test', 100, 1);

@@ -81,7 +81,8 @@ class TransactionController extends Controller
         $postBody = $request->getParsedBody() ?? [];
         $errors = static::buildErrorArray($postBody, ['description' => "'description' field is required"]);
 
-        if (!array_key_exists('points', $postBody)) {
+        $points = $postBody['points'] ?? null;
+        if ($points === null) {
             $errors[] = "'points' field is required";
         } else if ($postBody['points'] < 1) {
             $errors[] = "'points' field must be greater than 0";
