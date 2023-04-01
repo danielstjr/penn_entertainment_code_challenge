@@ -73,10 +73,9 @@ class TransactionController extends Controller
         try {
             $user = $this->userRepository->get($id);
         } catch (InvalidArgumentException) {
-            $response->getBody()->write("User with id {$id} not found");
-            return $response->withStatus(404);
+            return $this->setResponseStatusAndBody($response, 500, "User with id {$id} not found");
         } catch (Exception) {
-            return $response->withStatus(500);
+            return $this->setResponseStatusAndBody($response, 500, 'Failed to update point balance');
         }
 
         $postBody = $request->getParsedBody() ?? [];
@@ -91,10 +90,7 @@ class TransactionController extends Controller
         }
 
         if (!empty($errors)) {
-            $response->getBody()->write(json_encode(['errors' => $errors]));
-
-            return $response->withHeader(self::CONTENT_TYPE, self::JSON)
-                ->withStatus(400);
+            return $this->setJsonResponseStatusAndBody($response, 400, json_encode(['errors' => $errors]));
         }
 
         $points = $add ? $postBody['points'] : -$postBody['points'];
@@ -102,11 +98,9 @@ class TransactionController extends Controller
             $this->transactionRepository->create($postBody['description'], $points, $user);
             $this->userRepository->updatePoints($user, $user->getPointsBalance() + $points);
         } catch (Exception) {
-            $response->getBody()->write("Failed to update points balance for User id {$id}");
-            return $response->withStatus(500);
+            return $this->setResponseStatusAndBody($response, 500, "Failed to update points balance for User id {$id}");
         }
 
-        $response->getBody()->write("Points Balance Updated");
-        return $response->withStatus(200);
+        return $this->setResponseStatusAndBody($response, 200, 'Points balance updated');
     }
 }

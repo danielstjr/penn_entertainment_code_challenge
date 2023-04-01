@@ -37,12 +37,10 @@ class UserController extends Controller
         try {
             $users = $this->userRepository->getAll();
         } catch (Exception) {
-            return $response->withStatus(500, 'Failed to retrieve users');
+            return $this->setResponseStatusAndBody($response, 500, 'Failed to retrieve users');
         }
 
-        $response->getBody()->write(json_encode($users));
-
-        return $response->withHeader(self::CONTENT_TYPE, self::JSON)->withStatus(200);
+        return $this->setJsonResponseStatusAndBody($response, 200, json_encode($users));
     }
 
     /**
@@ -62,25 +60,18 @@ class UserController extends Controller
         ]);
 
         if (!empty($errors)) {
-            $response->getBody()->write(json_encode(['errors' => $errors]));
-
-            return $response->withHeader(self::CONTENT_TYPE, self::JSON)
-                ->withStatus(400, 'Invalid data for user creation');
+            return $this->setJsonResponseStatusAndBody($response, 400, json_encode(['errors' => $errors]));
         }
 
         try {
             $user = $this->userRepository->create($postData['email'], $postData['name']);
+
+            return $this->setJsonResponseStatusAndBody($response, 201, json_encode($user));
         } catch (InvalidArgumentException) {
-            $response->getBody()->write('User with this email address already exists');
-            return $response->withStatus(400, 'Duplicate Email');
-        } catch (Exception) {
-            $response->getBody()->write('Failed to create user');
-            return $response->withStatus(500, 'Internal Server Error');
+            return $this->setResponseStatusAndBody($response, 400, 'User with this email address already exists');
+        } catch (Exception $e) {
+            return $this->setResponseStatusAndBody($response, 500, 'Failed to Create User');
         }
-
-        $response->getBody()->write(json_encode($user));
-
-        return $response->withStatus(201);
     }
 
     /**
@@ -96,15 +87,13 @@ class UserController extends Controller
         try {
             $status = $this->userRepository->delete($id);
         } catch (Exception) {
-            $response->getBody()->write("User with id {$id} not found");
-            return $response->withStatus(404);
+            return $this->setResponseStatusAndBody($response, 404, "User with id {$id} not found");
         }
 
         if (!$status) {
-            return $response->withStatus(500, 'Internal Server Error');
+            return $this->setResponseStatusAndBody($response, 500, "Failed to delete user with id {$id}");
         }
 
-        $response->getBody()->write("User with id {$id} was deleted");
-        return $response->withStatus(200);
+        return $this->setResponseStatusAndBody($response, 200, "User with id {$id} was deleted");
     }
 }

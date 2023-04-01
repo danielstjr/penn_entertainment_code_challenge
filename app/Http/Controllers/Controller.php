@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Slim\Psr7\Response;
+
 /**
  * Class used for grouping common functions shared between all controllers
  */
@@ -29,5 +31,35 @@ abstract class Controller
         }
 
         return $errors;
+    }
+
+    /**
+     * Create a simple alias function to reduce noise in response changing function calls
+     *
+     * @param Response $response
+     * @param int $statusCode
+     * @param string $responseBody
+     *
+     * @return Response
+     */
+    protected function setResponseStatusAndBody(Response $response, int $statusCode, string $responseBody): Response
+    {
+        $response->getBody()->write($responseBody);
+        return $response->withStatus($statusCode);
+    }
+
+    /**
+     * Further alias of ->setResponseStatusAndBody to include the JSON content header
+     *
+     * @param Response $response
+     * @param int $statusCode
+     * @param string $responseBody
+     *
+     * @return Response
+     */
+    protected function setJsonResponseStatusAndBody(Response $response, int $statusCode, string $responseBody): Response
+    {
+        return $this->setResponseStatusAndBody($response, $statusCode, $responseBody)
+            ->withHeader(self::CONTENT_TYPE, self::JSON);
     }
 }
