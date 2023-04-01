@@ -91,6 +91,27 @@ class InMemoryTransactionRepository implements TransactionRepository
     }
 
     /**
+     * Remove all transactions model from the internal array for the given user
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function deleteForUser(User $user): bool
+    {
+        $newTransactions = [];
+        foreach ($this->transactions as $loopTransaction) {
+            if ($loopTransaction->getUser()->getId() === $user->getId()) {
+                continue;
+            }
+
+            $newTransactions[] = $loopTransaction;
+        }
+
+        $this->transactions = $newTransactions;
+        return true;
+    }
+
+    /**
      * Retrieves the Transaction associated with the given id
      *
      * @param int $id

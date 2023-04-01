@@ -26,6 +26,18 @@ class DatabaseTransactionRepository implements TransactionRepository
     }
 
     /**
+     * Allow the entity manager to do flush all data into the db at once, effectively enforcing DB transactions
+     */
+    public function __destruct()
+    {
+        try {
+            $this->entityManager->flush();
+        } catch (Exception) {
+            // TODO:: Log that data couldn't be persisted, should be pretty rare, also requires Log Library
+        }
+    }
+
+    /**
      * Creates a Transaction entity with the function args
      *
      * @param string $description
@@ -40,6 +52,8 @@ class DatabaseTransactionRepository implements TransactionRepository
         $transaction = new Transaction($description, $pointChange, $user);
         try {
             $this->entityManager->persist($transaction);
+
+            // Always force the db to create a new entity right away so we can return an ID to end users
             $this->entityManager->flush();
         } catch (Exception) {
             // Remap the exception here out of its implementation specific exception
@@ -66,7 +80,26 @@ class DatabaseTransactionRepository implements TransactionRepository
 
         try {
             $this->entityManager->remove($transaction);
-            $this->entityManager->flush();
+            return true;
+        } catch (Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Deletes all transactions for a user from the database
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function deleteForUser(User $user): bool
+    {
+        $transactions = $this->getForUser($user);
+        try {
+            foreach ($transactions as $transaction) {
+                $this->entityManager->remove($transaction);
+            }
+
             return true;
         } catch (Exception) {
             return false;
@@ -98,12 +131,11 @@ class DatabaseTransactionRepository implements TransactionRepository
      * @param User $user
      *
      * @return array
-     * @throws Exception When any of the transactions failed to be retrieved, mapped, and returned
      */
     public function getForUser(User $user): array
     {
         return $this->entityManager
             ->getRepository(Transaction::class)
-            ->findBy(['user_id' => $user->getId()]);
+            ->findBy(['user' => $user]);
     }
 }

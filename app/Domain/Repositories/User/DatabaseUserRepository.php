@@ -3,6 +3,7 @@
 namespace App\Domain\Repositories\User;
 
 use App\Domain\Models\User;
+use App\Domain\Repositories\Transaction\DatabaseTransactionRepository;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use InvalidArgumentException;
@@ -14,6 +15,8 @@ class DatabaseUserRepository implements UserRepository
 {
     private EntityManager $entityManager;
 
+    private DatabaseTransactionRepository $transactionRepository;
+
     /**
      * Construct the class with an associated Doctrine Entity Manager to interact with the Doctrine ORM
      *
@@ -22,6 +25,23 @@ class DatabaseUserRepository implements UserRepository
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
+        $this->transactionRepository = new DatabaseTransactionRepository($entityManager);
+    }
+
+    /**
+     * Allow the entity manager to do flush all data into the db at once, effectively enforcing transactions so there
+     * aren't data race conditions
+     */
+    public function __destruct()
+    {
+        try {
+            // Force the transaction repository to destruct first because it is the child relationship to the User,
+            // destructing first means we don't run into integrity constraint violations
+            $this->transactionRepository->__destruct();
+            $this->entityManager->flush();
+        } catch (Exception) {
+            // TODO:: Log that data couldn't be persisted, should be pretty rare
+        }
     }
 
     /**
@@ -45,6 +65,8 @@ class DatabaseUserRepository implements UserRepository
         $user = new User($email, $name, $pointBalance, null);
         try {
             $this->entityManager->persist($user);
+
+            // Always force the db to create a new entity right away so we can return an ID to end users
             $this->entityManager->flush();
         } catch (Exception) {
             // Remap the exception here out of its implementation specific exception
@@ -64,10 +86,10 @@ class DatabaseUserRepository implements UserRepository
      */
     public function delete(int $id): bool
     {
-        $existingUser = $this->get($id);
+        $user = $this->get($id);
         try {
-            $this->entityManager->remove($existingUser);
-            $this->entityManager->flush();
+            $this->transactionRepository->deleteForUser($user);
+            $this->entityManager->remove($user);
             return true;
         } catch (Exception) {
             return false;
@@ -97,7 +119,6 @@ class DatabaseUserRepository implements UserRepository
      * Utilize Doctrine's ORM to retrieve all available User instances from the database
      *
      * @return User[] Array of all user instances mapped to a Domain Model
-     * @throws Exception When any of the users failed to be retrieved, mapped, and returned
      */
     public function getAll(): array
     {
@@ -116,7 +137,6 @@ class DatabaseUserRepository implements UserRepository
         $user->setPointsBalance($newBalance);
         try {
             $this->entityManager->persist($user);
-            $this->entityManager->flush();
         } catch (Exception) {
             // Remap the error here to hide implementation details
             return false;

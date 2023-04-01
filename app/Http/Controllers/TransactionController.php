@@ -73,22 +73,28 @@ class TransactionController extends Controller
         try {
             $user = $this->userRepository->get($id);
         } catch (InvalidArgumentException) {
-            return $response->withStatus(404, "User with id {$id} not found");
+            $response->getBody()->write("User with id {$id} not found");
+            return $response->withStatus(404);
         } catch (Exception) {
-            return $response->withStatus(500, 'Internal Server Error');
+            return $response->withStatus(500);
         }
 
         $postBody = $request->getParsedBody() ?? [];
-        $errors = static::buildErrorArray($postBody, [
-            'points' => "'points' field is required",
-            'description' => "'description' field is required"
-        ]);
+        $errors = static::buildErrorArray($postBody, ['description' => "'description' field is required"]);
+
+        if (!array_key_exists('points', $postBody)) {
+            $errors[] = "'points' field is required";
+        } else if ($postBody['points'] < 1) {
+            $errors[] = "'points' field must be greater than 0";
+        } else if ($user->getPointsBalance() + ($add ? $postBody['points'] : -$postBody['points']) < 0) {
+            $errors[] = "Points transactions cannot leave a user with a negative points total";
+        }
 
         if (!empty($errors)) {
             $response->getBody()->write(json_encode(['errors' => $errors]));
 
             return $response->withHeader(self::CONTENT_TYPE, self::JSON)
-                ->withStatus(400, 'Invalid data for user creation');
+                ->withStatus(400);
         }
 
         $points = $add ? $postBody['points'] : -$postBody['points'];
@@ -96,9 +102,11 @@ class TransactionController extends Controller
             $this->transactionRepository->create($postBody['description'], $points, $user);
             $this->userRepository->updatePoints($user, $user->getPointsBalance() + $points);
         } catch (Exception) {
-            return $response->withStatus(500, "Failed to update points balance for User id {$id}");
+            $response->getBody()->write("Failed to update points balance for User id {$id}");
+            return $response->withStatus(500);
         }
 
-        return $response->withStatus(200, 'Points balance updated');
+        $response->getBody()->write("Points Balance Updated");
+        return $response->withStatus(200);
     }
 }

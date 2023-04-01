@@ -48,7 +48,6 @@ interface UserRepository
      * Retrieves all stored user data and maps each to a User Domain Model
      *
      * @return User[]
-     * @throws Exception When any of the users failed to be retrieved, mapped, and returned
      */
     public function getAll(): array;
 

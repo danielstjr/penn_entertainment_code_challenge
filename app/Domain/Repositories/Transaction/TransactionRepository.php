@@ -50,7 +50,15 @@ interface TransactionRepository
      * @param User $user
      *
      * @return array
-     * @throws Exception When any of the transactions failed to be retrieved, mapped, and returned
      */
     public function getForUser(User $user): array;
+
+    /**
+     * Delete all transactions for a given user
+     *
+     * @param User $user
+     *
+     * @return true
+     */
+    public function deleteForUser(User $user): bool;
 }

@@ -96,13 +96,15 @@ class UserController extends Controller
         try {
             $status = $this->userRepository->delete($id);
         } catch (Exception) {
-            return $response->withStatus(404, "User with id {$id} not found");
+            $response->getBody()->write("User with id {$id} not found");
+            return $response->withStatus(404);
         }
 
         if (!$status) {
             return $response->withStatus(500, 'Internal Server Error');
         }
 
-        return $response->withStatus(200, "User with id {$id} was deleted");
+        $response->getBody()->write("User with id {$id} was deleted");
+        return $response->withStatus(200);
     }
 }
