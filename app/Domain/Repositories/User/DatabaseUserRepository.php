@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Repositories;
+namespace App\Domain\Repositories\User;
 
 use App\Domain\Models\User;
 use Doctrine\ORM\EntityManager;
@@ -31,9 +31,9 @@ class DatabaseUserRepository implements UserRepository
      * @param string $name Name to be associated with the user
      * @param int $pointBalance Total points associated with the user through earning and after redemption
      *
-     * @throws InvalidArgumentException If the email is non-unique, or the points balance is less than 0
-     * @throws Exception If the user could not be created
      * @return User
+     * @throws Exception If the user could not be created
+     * @throws InvalidArgumentException If the email is non-unique, or the points balance is less than 0
      */
     public function create(string $email, string $name, int $pointBalance = 0): User
     {
@@ -42,7 +42,7 @@ class DatabaseUserRepository implements UserRepository
             throw new InvalidArgumentException('Duplicate Email Address');
         }
 
-        $user = new User($email, $name, null, $pointBalance);
+        $user = new User($email, $name, $pointBalance, null);
         try {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
@@ -59,8 +59,8 @@ class DatabaseUserRepository implements UserRepository
      *
      * @param int $id
      *
-     * @throws InvalidArgumentException If the id doesn't exist in the database
      * @return bool
+     * @throws InvalidArgumentException If the id doesn't exist in the database
      */
     public function delete(int $id): bool
     {
@@ -79,8 +79,8 @@ class DatabaseUserRepository implements UserRepository
      *
      * @param int $id Unique User identifier
      *
-     * @throws InvalidArgumentException When the user cannot be found, mapped, and returned
      * @return User Domain model retrieved from its database representation
+     * @throws InvalidArgumentException When the user cannot be found, mapped, and returned
      */
     public function get(int $id): User
     {
@@ -96,8 +96,8 @@ class DatabaseUserRepository implements UserRepository
     /**
      * Utilize Doctrine's ORM to retrieve all available User instances from the database
      *
-     * @throws Exception When any of the users failed to be retrieved, mapped, and returned
      * @return User[] Array of all user instances mapped to a Domain Model
+     * @throws Exception When any of the users failed to be retrieved, mapped, and returned
      */
     public function getAll(): array
     {

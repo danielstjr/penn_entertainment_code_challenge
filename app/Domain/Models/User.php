@@ -17,7 +17,7 @@ use JsonSerializable;
 final class User implements JsonSerializable
 {
     #[Id, Column, GeneratedValue]
-    private ?int $id = null;
+    private ?int $id;
 
     #[Column(type: Types::STRING, unique: true)]
     private string $email;
@@ -36,7 +36,7 @@ final class User implements JsonSerializable
      * @param int|null $id
      * @param int $pointsBalance
      */
-    public function __construct(string $email, string $name, int $id = null, int $pointsBalance = 0)
+    public function __construct(string $email, string $name, int $pointsBalance, int $id = null)
     {
         $this->email = $email;
         $this->id = $id;
@@ -67,6 +67,17 @@ final class User implements JsonSerializable
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * This is primarily here for consistency, and to assist the ORM in setting after save
+     *
+     * @param int $newId
+     * @return void
+     */
+    public function setId(int $newId): void
+    {
+        $this->id = $newId;
     }
 
     /**

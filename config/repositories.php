@@ -1,8 +1,8 @@
 <?php
 
+use App\Domain\Repositories\User\DatabaseUserRepository;
+use App\Domain\Repositories\User\UserRepository;
 use Doctrine\Migrations\DependencyFactory;
-use App\Domain\Repositories\DatabaseUserRepository;
-use App\Domain\Repositories\UserRepository;
 use Psr\Container\ContainerInterface;
 
 /**

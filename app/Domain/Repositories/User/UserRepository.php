@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Repositories;
+namespace App\Domain\Repositories\User;
 
 use App\Domain\Models\User;
 use Exception;
@@ -18,9 +18,9 @@ interface UserRepository
      * @param string $name
      * @param int $pointBalance
      *
-     * @throws InvalidArgumentException If the email is non-unique, or the points balance is less than 0
-     * @throws Exception If the user could not be created
      * @return User
+     * @throws Exception If the user could not be created
+     * @throws InvalidArgumentException If the email is non-unique, or the points balance is less than 0
      */
     public function create(string $email, string $name, int $pointBalance = 0): User;
 
@@ -29,8 +29,8 @@ interface UserRepository
      *
      * @param int $id
      *
-     * @throws InvalidArgumentException If the id doesn't associate to a user
      * @return bool True if the data was deleted, false if it wasn't
+     * @throws InvalidArgumentException If the id doesn't associate to a user
      */
     public function delete(int $id): bool;
 
@@ -39,16 +39,16 @@ interface UserRepository
      *
      * @param int $id
      *
-     * @throws InvalidArgumentException When the user cannot be found
      * @return User
+     * @throws InvalidArgumentException When the user cannot be found
      */
     public function get(int $id): User;
 
     /**
      * Retrieves all stored user data and maps each to a User Domain Model
      *
-     * @throws Exception When any of the users failed to be retrieved, mapped, and returned
      * @return User[]
+     * @throws Exception When any of the users failed to be retrieved, mapped, and returned
      */
     public function getAll(): array;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Repositories;
+namespace App\Domain\Repositories\User;
 
 use App\Domain\Models\User;
 use InvalidArgumentException;
@@ -38,7 +38,7 @@ class InMemoryUserRepository implements UserRepository
      */
     public function create(string $email, string $name, int $pointBalance = 0): User
     {
-        $user = new User($email, $name, count($this->users) + 1, $pointBalance);
+        $user = new User($email, $name, $pointBalance, count($this->users) + 1);
         $this->users[] = $user;
 
         return $user;
@@ -78,12 +78,12 @@ class InMemoryUserRepository implements UserRepository
      *
      * @param int $id
      *
-     * @throws InvalidArgumentException When the $id is not found in the internal user array
      * @return User
+     * @throws InvalidArgumentException When the $id is not found in the internal user array
      */
     public function get(int $id): User
     {
-        foreach($this->users as $user) {
+        foreach ($this->users as $user) {
             if ($user->getId() === $id) {
                 return $user;
             }

@@ -3,7 +3,7 @@
 namespace Test\Http\Controllers;
 
 use App\Domain\Models\User;
-use App\Domain\Repositories\InMemoryUserRepository;
+use App\Domain\Repositories\User\InMemoryUserRepository;
 use App\Http\Controllers\UserController;
 use PHPUnit\Framework\TestCase;
 use Slim\Psr7\Request;
@@ -97,7 +97,7 @@ class UserControllerTest extends TestCase
 
     public function testEarnPointsEndpointRequiresPointsAndDescription()
     {
-        $user = new User('test@example.com', 'test', 1, 100);
+        $user = new User('test@example.com', 'test', 100, 1);
         $repository = $this->createMock(InMemoryUserRepository::class);
         $repository->expects($this->once())
             ->method('get')
@@ -124,7 +124,7 @@ class UserControllerTest extends TestCase
 
     public function testRedeemPointsEndpointRequiresPointsAndDescription()
     {
-        $user = new User('test@example.com', 'test', 1, 100);
+        $user = new User('test@example.com', 'test', 100, 1);
         $repository = $this->createMock(InMemoryUserRepository::class);
         $repository->expects($this->once())
             ->method('get')
@@ -154,7 +154,7 @@ class UserControllerTest extends TestCase
         $balance = 100;
         $pointsParameter = 10;
 
-        $user = new User('test@example.com', 'test', 1, $balance);
+        $user = new User('test@example.com', 'test', $balance, 1);
 
         $repository = $this->createMock(InMemoryUserRepository::class);
         $repository->expects($this->once())
@@ -183,7 +183,7 @@ class UserControllerTest extends TestCase
         $balance = 100;
         $pointsParameter = 10;
 
-        $user = new User('test@example.com', 'test', 1, $balance);
+        $user = new User('test@example.com', 'test', $balance, 1);
 
         $repository = $this->createMock(InMemoryUserRepository::class);
         $repository->expects($this->once())

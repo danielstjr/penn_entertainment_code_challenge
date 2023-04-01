@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Repositories\UserRepository;
+use App\Domain\Repositories\User\UserRepository;
 use Exception;
 use InvalidArgumentException;
 use Slim\Psr7\Request;
@@ -60,7 +60,6 @@ class UserController
     public function create(Request $request, Response $response): Response
     {
         $postData = $request->getParsedBody() ?? [];
-        var_dump($postData) . "\n";
         $errors = static::buildErrorArray($postData, [
             'email' => "'email' field is required",
             'name' => "'name' field is required",
